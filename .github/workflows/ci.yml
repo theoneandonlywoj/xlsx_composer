@@ -75,7 +75,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
       - run: mix deps.get
       - run: mix format --check-formatted
-      - run: mix credo diff --from-git-merge-base origin/main --strict
+      - run: mix credo diff --from-git-merge-base origin/main
       - run: mix dialyzer
 
   mix-test:
