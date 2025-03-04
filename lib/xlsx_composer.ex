@@ -99,8 +99,8 @@ defmodule XLSXComposer do
     iex>   })
 
   """
-  @spec example() :: :ok
-  def example() do
+  @spec example :: :ok
+  def example do
     :ok
   end
 end
