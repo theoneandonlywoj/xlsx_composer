@@ -9,13 +9,13 @@ defmodule XLSXComposer.ExcelCoords do
   alias XLSXComposer.SectionCoords
 
   @type t() :: %ExcelCoords{
-          x: x_coord(),
-          y: y_coord(),
+          x: x(),
+          y: y(),
           pretty: String.t()
         }
 
-  @type x_coord() :: pos_integer()
-  @type y_coord() :: pos_integer()
+  @type x() :: pos_integer()
+  @type y() :: pos_integer()
 
   @type area_t() :: {t(), t()}
 
@@ -23,12 +23,12 @@ defmodule XLSXComposer.ExcelCoords do
             y: 1,
             pretty: "A1"
 
-  @spec build({x_coord(), y_coord()}) :: t()
+  @spec build({x(), y()}) :: t()
   def build({x, y}) do
     build(x, y)
   end
 
-  @spec build(x_coord(), y_coord()) :: t()
+  @spec build(x(), y()) :: t()
   def build(x \\ 1, y \\ 1) do
     %ExcelCoords{
       x: x,
