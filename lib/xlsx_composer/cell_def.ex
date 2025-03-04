@@ -1,6 +1,7 @@
 defmodule XLSXComposer.CellDef do
   @moduledoc """
-  #{__MODULE__} showcases all supported options as a struct that is later folded into representation required by Elixlsx.Color
+  #{__MODULE__} showcases all supported options as a struct that is later folded into representation required by Elixlsx.
+
   `:configuration` is a map of settings you might want to use to tag elements and later on, globally collect and apply an additional style if required.
   """
   alias XLSXComposer.CellDef
