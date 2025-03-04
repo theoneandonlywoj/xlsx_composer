@@ -1,6 +1,7 @@
 defmodule XLSXComposer.ExcelCoords do
   @moduledoc """
   #{__MODULE__} represent excel coords where the x denotes the column (represented as integer, A = 1) and y denotes the row.
+
   Both values start from 1 (to mimic the Excel notation and interchangeability)!
   """
 

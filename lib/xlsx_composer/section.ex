@@ -1,9 +1,9 @@
 defmodule XLSXComposer.Section do
   @moduledoc """
   #{__MODULE__} allows to group cells into units that we can reason and test on that level.
-  Soon, implementation of checking of Sections will have to be done so use Section carefully.
 
   WARNING! : Build limited number of Sections otherwise the process of the checks might hurt your performance!
+  Soon, implementation of checking of Sections overlap will have to be done so use Section carefully.
   """
   alias XLSXComposer.CellDef
   alias XLSXComposer.ExcelCoords

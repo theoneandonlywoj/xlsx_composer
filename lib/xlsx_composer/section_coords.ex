@@ -1,6 +1,7 @@
 defmodule XLSXComposer.SectionCoords do
   @moduledoc """
   #{__MODULE__} represents location of the cell in a given section.
+
   This approach allows use to move a group of cells at ones.
   Furthermore, this approach allows for an easier understanding of the structure of the document while being performant.
   """
