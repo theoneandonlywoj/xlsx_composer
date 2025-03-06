@@ -42,7 +42,6 @@ defmodule XLSXComposer.Sheet do
     %Sheet{
       name: args[:name] || "",
       excel_cells: excel_cells,
-      # excel_cells |> Enum.map()
       max_row_idx: max_row_idx
     }
     |> validate()
@@ -53,7 +52,7 @@ defmodule XLSXComposer.Sheet do
     {:ok, sheet}
   end
 
-  @spec validate(Sheet.t()) :: []
+  @spec to_elixlsx_rows(Sheet.t()) :: []
   def to_elixlsx_rows(%Sheet{} = sheet) do
     group_excel_cell_by_row_idx =
       group_excel_cell_by_row_idx(sheet.excel_cells)
@@ -84,6 +83,14 @@ defmodule XLSXComposer.Sheet do
     end)
   end
 
+  # @spec to_elixlsx_sheet(Sheet.t()) :: Elixlsx.Sheet.t()
+  def to_elixlsx_sheet(%Sheet{} = sheet) do
+    %Elixlsx.Sheet{
+      name: sheet.name,
+      rows: to_elixlsx_rows(sheet)
+    }
+  end
+
   @spec excel_rows_max_column(excel_cell_by_row_idx()) :: %{integer() => integer()}
   def excel_rows_max_column(grouped_excel_cell_by_row_idx) do
     grouped_excel_cell_by_row_idx
@@ -101,10 +108,7 @@ defmodule XLSXComposer.Sheet do
 
   @spec generate_empty_row(non_neg_integer()) :: [nil]
   def generate_empty_row(0), do: []
-
-  def generate_empty_row(max_column) do
-    Enum.map(1..max_column, fn _ -> nil end)
-  end
+  def generate_empty_row(max_column), do: Enum.map(1..max_column, fn _ -> nil end)
 
   @spec group_excel_cell_by_row_idx(CellDef.excel_cells()) :: excel_cell_by_row_idx()
   def group_excel_cell_by_row_idx(excel_cells) do
