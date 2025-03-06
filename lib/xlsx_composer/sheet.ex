@@ -83,6 +83,14 @@ defmodule XLSXComposer.Sheet do
     end)
   end
 
+  # @spec to_elixlsx_sheet(Sheet.t()) :: Elixlsx.Sheet.t()
+  def to_elixlsx_sheet(%Sheet{} = sheet) do
+    %Elixlsx.Sheet{
+      name: sheet.name,
+      rows: to_elixlsx_rows(sheet)
+    }
+  end
+
   @spec excel_rows_max_column(excel_cell_by_row_idx()) :: %{integer() => integer()}
   def excel_rows_max_column(grouped_excel_cell_by_row_idx) do
     grouped_excel_cell_by_row_idx
