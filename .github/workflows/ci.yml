@@ -73,7 +73,7 @@ jobs:
             _build
             priv/plts
           key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-#      - run: mix deps.get
+      - run: mix deps.get
       - run: MIX_ENV=dev mix compile
 
   compile-test:
@@ -105,7 +105,7 @@ jobs:
             _build
             priv/plts
           key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-#      - run: mix deps.get
+      - run: mix deps.get
       - run: MIX_ENV=test mix compile
 
   static-code-analysis:
