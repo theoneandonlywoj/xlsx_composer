@@ -10,7 +10,7 @@ defmodule XLSXComposer.CellDef do
 
   @type t() :: %CellDef{
           # Content / Text
-          content: any(),
+          content: content(),
           wrap_text: boolean() | nil,
           font: String | nil,
           # Align
@@ -53,8 +53,8 @@ defmodule XLSXComposer.CellDef do
           | {:yyyymmdd, boolean()}
   @type border_style() :: list()
 
-  # type any() represents content
-  @type elixlsx_definition() :: [any() | {style_options(), any()}]
+  @type content() :: any()
+  @type elixlsx_definition() :: [content() | {style_options(), any()}]
 
   @type section_cells() :: %{SectionCoords.t() => CellDef.t()}
 
@@ -133,6 +133,7 @@ defmodule XLSXComposer.CellDef do
     }
   end
 
+  @spec set_content(CellDef.t(), content()) :: CellDef.t()
   def set_content(%CellDef{} = cell_def, content), do: %CellDef{cell_def | content: content}
 
   @spec set_style_option(CellDef.t(), style_options()) :: CellDef.t()
@@ -157,6 +158,7 @@ defmodule XLSXComposer.CellDef do
     ExcelCoords.build(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
   end
 
+  @spec to_elixlsx_cell_def(CellDef.t() | nil) :: elixlsx_definition() | nil
   def to_elixlsx_cell_def(nil), do: nil
 
   def to_elixlsx_cell_def(%CellDef{} = cell_def) do
