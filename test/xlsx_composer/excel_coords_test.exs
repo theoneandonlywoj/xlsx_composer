@@ -32,8 +32,8 @@ defmodule XLSXComposer.ExcelCoordsTest do
     end
 
     test "builds for ZZZ1 (Google Sheet column limit)" do
-      assert ExcelCoords.build({18278, 1}) ===
-               %ExcelCoords{x: 18278, y: 1, pretty: "ZZZ1"}
+      assert ExcelCoords.build({18_278, 1}) ===
+               %ExcelCoords{x: 18_278, y: 1, pretty: "ZZZ1"}
     end
   end
 
@@ -63,8 +63,8 @@ defmodule XLSXComposer.ExcelCoordsTest do
     end
 
     test "builds for ZZZ1 (Google Sheet column limit)" do
-      assert ExcelCoords.build(18278, 1) ===
-               %ExcelCoords{x: 18278, y: 1, pretty: "ZZZ1"}
+      assert ExcelCoords.build(18_278, 1) ===
+               %ExcelCoords{x: 18_278, y: 1, pretty: "ZZZ1"}
     end
   end
 
