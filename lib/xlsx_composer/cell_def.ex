@@ -106,7 +106,7 @@ defmodule XLSXComposer.CellDef do
   def build(args \\ %{}) do
     %CellDef{
       # Content / Text
-      content: args[:content] || "",
+      content: args[:content] || nil,
       wrap_text: args[:wrap_text],
       font: args[:font],
       # Align
