@@ -102,8 +102,8 @@ defmodule XLSXComposer.CellDef do
             # Configuration
             configuration: %{}
 
-  @spec build(map()) :: t()
-  def build(args \\ %{}) do
+  @spec new(map()) :: t()
+  def new(args \\ %{}) do
     %CellDef{
       # Content / Text
       content: args[:content] || nil,
@@ -155,7 +155,7 @@ defmodule XLSXComposer.CellDef do
 
   @spec displace(ExcelCoords.t(), SectionCoords.t()) :: ExcelCoords.t()
   def displace(%ExcelCoords{} = excel_coords, %SectionCoords{} = section_cords) do
-    ExcelCoords.build(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
+    ExcelCoords.new(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
   end
 
   @spec to_elixlsx_cell_def(CellDef.t() | nil) :: elixlsx_definition() | nil

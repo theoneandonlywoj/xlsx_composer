@@ -22,8 +22,8 @@ defmodule XLSXComposer.Sheet do
             excel_cells: %{},
             max_row_idx: 0
 
-  @spec build(map()) :: {:ok, Sheet.t()} | {:error, term()}
-  def build(args) do
+  @spec new(map()) :: {:ok, Sheet.t()} | {:error, term()}
+  def new(args) do
     sections = args[:sections] || []
 
     max_row_idx =

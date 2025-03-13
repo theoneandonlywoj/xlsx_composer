@@ -6,19 +6,19 @@ defmodule XLSXComposer.ExcelCoordsTest do
 
   doctest XLSXComposer.ExcelCoords
 
-  describe "build/1" do
-    test "builds for A1" do
-      assert ExcelCoords.build({1, 1}) ===
+  describe "new/1" do
+    test "news for A1" do
+      assert ExcelCoords.new({1, 1}) ===
                %ExcelCoords{x: 1, y: 1, pretty: "A1"}
     end
 
-    test "builds for Z1" do
-      assert ExcelCoords.build({26, 1}) ===
+    test "news for Z1" do
+      assert ExcelCoords.new({26, 1}) ===
                %ExcelCoords{x: 26, y: 1, pretty: "Z1"}
     end
 
-    test "builds for A10000000 (Google Sheet row limit)" do
-      assert ExcelCoords.build({1, 10_000_000}) ===
+    test "news for A10000000 (Google Sheet row limit)" do
+      assert ExcelCoords.new({1, 10_000_000}) ===
                %ExcelCoords{
                  x: 1,
                  y: 10_000_000,
@@ -26,30 +26,30 @@ defmodule XLSXComposer.ExcelCoordsTest do
                }
     end
 
-    test "builds for AA1 (beyond just A-Z)" do
-      assert ExcelCoords.build({27, 1}) ===
+    test "news for AA1 (beyond just A-Z)" do
+      assert ExcelCoords.new({27, 1}) ===
                %ExcelCoords{x: 27, y: 1, pretty: "AA1"}
     end
 
-    test "builds for ZZZ1 (Google Sheet column limit)" do
-      assert ExcelCoords.build({18_278, 1}) ===
+    test "news for ZZZ1 (Google Sheet column limit)" do
+      assert ExcelCoords.new({18_278, 1}) ===
                %ExcelCoords{x: 18_278, y: 1, pretty: "ZZZ1"}
     end
   end
 
-  describe "build/2" do
-    test "builds for A1" do
-      assert ExcelCoords.build(1, 1) ===
+  describe "new/2" do
+    test "news for A1" do
+      assert ExcelCoords.new(1, 1) ===
                %ExcelCoords{x: 1, y: 1, pretty: "A1"}
     end
 
-    test "builds for Z1" do
-      assert ExcelCoords.build(26, 1) ===
+    test "news for Z1" do
+      assert ExcelCoords.new(26, 1) ===
                %ExcelCoords{x: 26, y: 1, pretty: "Z1"}
     end
 
-    test "builds for A10000000 (Google Sheet row limit)" do
-      assert ExcelCoords.build(1, 10_000_000) ===
+    test "news for A10000000 (Google Sheet row limit)" do
+      assert ExcelCoords.new(1, 10_000_000) ===
                %ExcelCoords{
                  x: 1,
                  y: 10_000_000,
@@ -57,13 +57,13 @@ defmodule XLSXComposer.ExcelCoordsTest do
                }
     end
 
-    test "builds for AA1 (beyond just A-Z)" do
-      assert ExcelCoords.build(27, 1) ===
+    test "news for AA1 (beyond just A-Z)" do
+      assert ExcelCoords.new(27, 1) ===
                %ExcelCoords{x: 27, y: 1, pretty: "AA1"}
     end
 
-    test "builds for ZZZ1 (Google Sheet column limit)" do
-      assert ExcelCoords.build(18_278, 1) ===
+    test "news for ZZZ1 (Google Sheet column limit)" do
+      assert ExcelCoords.new(18_278, 1) ===
                %ExcelCoords{x: 18_278, y: 1, pretty: "ZZZ1"}
     end
   end
@@ -78,14 +78,14 @@ defmodule XLSXComposer.ExcelCoordsTest do
     test "displace by (0, 0)", %{excel_coords: excel_coords} do
       assert ExcelCoords.displace(
                excel_coords,
-               SectionCoords.build(0, 0)
+               SectionCoords.new(0, 0)
              ) === excel_coords
     end
 
     test "displace by (1, 1)", %{excel_coords: excel_coords} do
       assert ExcelCoords.displace(
                excel_coords,
-               SectionCoords.build(1, 1)
+               SectionCoords.new(1, 1)
              ) === %ExcelCoords{
                x: 6,
                y: 6,
@@ -96,7 +96,7 @@ defmodule XLSXComposer.ExcelCoordsTest do
     test "displace by (1, -1)", %{excel_coords: excel_coords} do
       assert ExcelCoords.displace(
                excel_coords,
-               SectionCoords.build(1, -1)
+               SectionCoords.new(1, -1)
              ) === %ExcelCoords{
                x: 6,
                y: 4,
@@ -107,7 +107,7 @@ defmodule XLSXComposer.ExcelCoordsTest do
     test "displace by (-1, -1)", %{excel_coords: excel_coords} do
       assert ExcelCoords.displace(
                excel_coords,
-               SectionCoords.build(-1, -1)
+               SectionCoords.new(-1, -1)
              ) === %ExcelCoords{
                x: 4,
                y: 4,
@@ -118,7 +118,7 @@ defmodule XLSXComposer.ExcelCoordsTest do
     test "displace by (-1, 1)", %{excel_coords: excel_coords} do
       assert ExcelCoords.displace(
                excel_coords,
-               SectionCoords.build(-1, 1)
+               SectionCoords.new(-1, 1)
              ) === %ExcelCoords{
                x: 4,
                y: 6,

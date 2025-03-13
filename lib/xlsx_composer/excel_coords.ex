@@ -23,13 +23,11 @@ defmodule XLSXComposer.ExcelCoords do
             y: 1,
             pretty: "A1"
 
-  @spec build({x(), y()}) :: t()
-  def build({x, y}) do
-    build(x, y)
-  end
+  @spec new({x(), y()}) :: t()
+  def new({x, y}), do: new(x, y)
 
-  @spec build(x(), y()) :: t()
-  def build(x \\ 1, y \\ 1) do
+  @spec new(x(), y()) :: t()
+  def new(x \\ 1, y \\ 1) do
     %ExcelCoords{
       x: x,
       y: y,
@@ -39,7 +37,7 @@ defmodule XLSXComposer.ExcelCoords do
 
   @spec displace(ExcelCoords.t(), SectionCoords.t()) :: ExcelCoords.t()
   def displace(%ExcelCoords{} = excel_coords, %SectionCoords{} = section_cords) do
-    ExcelCoords.build(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
+    ExcelCoords.new(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
   end
 
   @spec column(ExcelCoords.t()) :: pos_integer()
