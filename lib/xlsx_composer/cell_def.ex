@@ -36,6 +36,34 @@ defmodule XLSXComposer.CellDef do
           configuration: %{String.t() => any()}
         }
 
+  @type new_attrs() :: %{
+          # Content / Text
+          content: content(),
+          wrap_text: boolean(),
+          font: String,
+          # Align
+          align_vertical: boolean(),
+          align_horizontal: boolean(),
+          # Style
+          bold: boolean(),
+          italic: boolean(),
+          underline: boolean(),
+          strike: boolean(),
+          size: pos_integer(),
+          # Colors
+          color: String.t(),
+          bg_color: String.t(),
+          # Numerical Format
+          num_format: String.t(),
+          # Date
+          datetime: boolean(),
+          yyyymmdd: String.t(),
+          # Border
+          border: Keyword.t(),
+          # Configuration
+          configuration: %{String.t() => any()}
+        }
+
   @type style_options() ::
           {:wrap_text, boolean()}
           | {:font, String.t()}
@@ -54,6 +82,7 @@ defmodule XLSXComposer.CellDef do
   @type border_style() :: list()
 
   @type content() :: any()
+
   @type elixlsx_definition() :: [content() | {style_options(), any()}]
 
   @type section_cells() :: %{SectionCoords.t() => CellDef.t()}
