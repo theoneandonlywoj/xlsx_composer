@@ -79,6 +79,7 @@ defmodule XLSXComposer.CellDef do
           | {:num_format, String.t()}
           | {:datetime, boolean()}
           | {:yyyymmdd, boolean()}
+
   @type border_style() :: list()
 
   @type content() :: any()
