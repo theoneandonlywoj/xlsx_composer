@@ -37,31 +37,23 @@ defmodule XLSXComposer.CellDef do
         }
 
   @type new_attrs() :: %{
-          # Content / Text
-          content: content(),
-          wrap_text: boolean(),
-          font: String,
-          # Align
-          align_vertical: boolean(),
-          align_horizontal: boolean(),
-          # Style
-          bold: boolean(),
-          italic: boolean(),
-          underline: boolean(),
-          strike: boolean(),
-          size: pos_integer(),
-          # Colors
-          color: String.t(),
-          bg_color: String.t(),
-          # Numerical Format
-          num_format: String.t(),
-          # Date
-          datetime: boolean(),
-          yyyymmdd: String.t(),
-          # Border
-          border: Keyword.t(),
-          # Configuration
-          configuration: %{String.t() => any()}
+          optional(:content) => content(),
+          optional(:wrap_text) => boolean(),
+          optional(:font) => String.t(),
+          optional(:align_vertical) => boolean(),
+          optional(:align_horizontal) => boolean(),
+          optional(:bold) => boolean(),
+          optional(:italic) => boolean(),
+          optional(:underline) => boolean(),
+          optional(:strike) => boolean(),
+          optional(:size) => pos_integer(),
+          optional(:color) => String.t(),
+          optional(:bg_color) => String.t(),
+          optional(:num_format) => String.t(),
+          optional(:datetime) => boolean(),
+          optional(:yyyymmdd) => String.t(),
+          optional(:border) => Keyword.t(),
+          optional(:configuration) => %{String.t() => any()}
         }
 
   @type style_option() ::
@@ -132,7 +124,7 @@ defmodule XLSXComposer.CellDef do
             # Configuration
             configuration: %{}
 
-  @spec new(map()) :: t()
+  @spec new(new_attrs() | %{}) :: t()
   def new(args \\ %{}) do
     %CellDef{
       # Content / Text
