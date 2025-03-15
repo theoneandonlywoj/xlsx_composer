@@ -18,13 +18,11 @@ defmodule XLSXComposer.SectionCoords do
   defstruct x: 0,
             y: 0
 
-  @spec build({x(), y()}) :: t()
-  def build({x, y}) do
-    build(x, y)
-  end
+  @spec new({x(), y()}) :: t()
+  def new({x, y}), do: new(x, y)
 
-  @spec build(x(), y()) :: t()
-  def build(x \\ 0, y \\ 0) do
+  @spec new(x(), y()) :: t()
+  def new(x \\ 0, y \\ 0) do
     %SectionCoords{
       x: x,
       y: y

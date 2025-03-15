@@ -2,7 +2,7 @@ defmodule XLSXComposer.Section do
   @moduledoc """
   #{__MODULE__} allows to group cells into units that we can reason and test on that level.
 
-  WARNING! : Build limited number of Sections otherwise the process of the checks might hurt your performance!
+  WARNING! : limit number of Sections otherwise the process of the checks might hurt your performance!
   Soon, implementation of checking of Sections overlap will have to be done so use Section carefully.
   """
   alias XLSXComposer.CellDef
@@ -17,18 +17,24 @@ defmodule XLSXComposer.Section do
           bottom_right: ExcelCoords.t()
         }
 
+  @type new_attrs() :: %{
+          name: name_t(),
+          top_left: ExcelCoords.t(),
+          cells: CellDef.section_cells()
+        }
+
   @type name_t() :: String.t()
 
   @type area_t() :: {ExcelCoords.t(), ExcelCoords.t()}
 
   defstruct name: "",
             cells: %{},
-            top_left: ExcelCoords.build(),
-            bottom_right: ExcelCoords.build()
+            top_left: ExcelCoords.new(),
+            bottom_right: ExcelCoords.new()
 
-  @spec build(map()) :: Section.t()
-  def build(args) do
-    top_left = args[:top_left] || ExcelCoords.build()
+  @spec new(new_attrs()) :: Section.t()
+  def new(args) do
+    top_left = args[:top_left] || ExcelCoords.new()
     cells = args[:cells] || %{}
 
     %Section{
@@ -55,7 +61,7 @@ defmodule XLSXComposer.Section do
         {new_bottom_right_x, new_bottom_right_y}
       end
     )
-    |> SectionCoords.build()
+    |> SectionCoords.new()
     |> then(&ExcelCoords.displace(top_left, &1))
   end
 
