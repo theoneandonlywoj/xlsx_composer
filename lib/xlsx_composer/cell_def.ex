@@ -64,7 +64,7 @@ defmodule XLSXComposer.CellDef do
           configuration: %{String.t() => any()}
         }
 
-  @type style_options() ::
+  @type style_option() ::
           {:wrap_text, boolean()}
           | {:font, String.t()}
           | {:align_vertical, boolean()}
@@ -84,7 +84,7 @@ defmodule XLSXComposer.CellDef do
 
   @type content() :: any()
 
-  @type elixlsx_definition() :: [content() | {style_options(), any()}]
+  @type elixlsx_definition() :: [content() | {style_option(), any()}]
 
   @type section_cells() :: %{SectionCoords.t() => CellDef.t()}
 
@@ -166,7 +166,7 @@ defmodule XLSXComposer.CellDef do
   @spec set_content(CellDef.t(), content()) :: CellDef.t()
   def set_content(%CellDef{} = cell_def, content), do: %CellDef{cell_def | content: content}
 
-  @spec set_style_option(CellDef.t(), style_options()) :: CellDef.t()
+  @spec set_style_option(CellDef.t(), style_option()) :: CellDef.t()
   def set_style_option(%CellDef{} = cell_def, {option, value}) do
     Map.put(cell_def, option, value)
   end
