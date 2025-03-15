@@ -14,6 +14,11 @@ defmodule XLSXComposer.Sheet do
           max_row_idx: integer()
         }
 
+  @type new_attrs() :: %{
+          name: String.t(),
+          excel_cells: CellDef.excel_cells()
+        }
+
   @type excel_cell_by_row_idx() :: %{
           integer() => [CellDef.excel_cells()]
         }
@@ -22,7 +27,7 @@ defmodule XLSXComposer.Sheet do
             excel_cells: %{},
             max_row_idx: 0
 
-  @spec new(map()) :: {:ok, Sheet.t()} | {:error, term()}
+  @spec new(new_attrs()) :: {:ok, Sheet.t()} | {:error, term()}
   def new(args) do
     sections = args[:sections] || []
 
