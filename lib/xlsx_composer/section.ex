@@ -17,6 +17,12 @@ defmodule XLSXComposer.Section do
           bottom_right: ExcelCoords.t()
         }
 
+  @type new_attrs() :: %{
+          name: name_t(),
+          top_left: ExcelCoords.t(),
+          cells: CellDef.section_cells()
+        }
+
   @type name_t() :: String.t()
 
   @type area_t() :: {ExcelCoords.t(), ExcelCoords.t()}
@@ -26,7 +32,7 @@ defmodule XLSXComposer.Section do
             top_left: ExcelCoords.new(),
             bottom_right: ExcelCoords.new()
 
-  @spec new(map()) :: Section.t()
+  @spec new(new_attrs()) :: Section.t()
   def new(args) do
     top_left = args[:top_left] || ExcelCoords.new()
     cells = args[:cells] || %{}
