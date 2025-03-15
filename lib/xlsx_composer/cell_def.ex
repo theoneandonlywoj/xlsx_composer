@@ -124,7 +124,7 @@ defmodule XLSXComposer.CellDef do
             # Configuration
             configuration: %{}
 
-  @spec new(new_attrs() | %{}) :: t()
+  @spec new(new_attrs()) :: t()
   def new(args \\ %{}) do
     %CellDef{
       # Content / Text
