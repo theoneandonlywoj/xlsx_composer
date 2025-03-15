@@ -2,7 +2,7 @@ defmodule XLSXComposer.ExcelCoordsTest do
   alias XLSXComposer.ExcelCoords
   alias XLSXComposer.SectionCoords
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   doctest XLSXComposer.ExcelCoords
 
@@ -124,6 +124,38 @@ defmodule XLSXComposer.ExcelCoordsTest do
                y: 6,
                pretty: "D6"
              }
+    end
+  end
+
+  describe "to_pretty/1" do
+    test "for A1" do
+      assert {1, 1}
+             |> ExcelCoords.new()
+             |> ExcelCoords.to_pretty() === "A1"
+    end
+
+    test "for Z1" do
+      assert {26, 1}
+             |> ExcelCoords.new()
+             |> ExcelCoords.to_pretty() === "Z1"
+    end
+
+    test "for A10000000 (Google Sheet row limit)" do
+      assert {1, 10_000_000}
+             |> ExcelCoords.new()
+             |> ExcelCoords.to_pretty() === "A10000000"
+    end
+
+    test "for AA1" do
+      assert {27, 1}
+             |> ExcelCoords.new()
+             |> ExcelCoords.to_pretty() === "AA1"
+    end
+
+    test "for ZZZ1" do
+      assert {18_278, 1}
+             |> ExcelCoords.new()
+             |> ExcelCoords.to_pretty() === "ZZZ1"
     end
   end
 end
