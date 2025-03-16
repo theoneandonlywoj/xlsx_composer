@@ -198,4 +198,97 @@ defmodule XLSXComposer.CellDefTest do
              }
     end
   end
+
+  describe "to_elixlsx_def/1" do
+    test "content: String.t()" do
+      content = "String"
+
+      assert %{content: content}
+             |> CellDef.new()
+             |> CellDef.to_elixlsx_cell_def() === [content]
+    end
+
+    test "content: integer()" do
+      content = 6
+
+      assert %{content: content}
+             |> CellDef.new()
+             |> CellDef.to_elixlsx_cell_def() === [content]
+    end
+
+    test "content: float()" do
+      content = 6.6
+
+      assert %{content: content}
+             |> CellDef.new()
+             |> CellDef.to_elixlsx_cell_def() === [content]
+    end
+
+    test "content: nil doesn't add nil in the Elixlsx definition" do
+      content = nil
+
+      assert %{content: content}
+             |> CellDef.new()
+             |> CellDef.to_elixlsx_cell_def() === []
+    end
+
+    @boolean_values [true, false]
+
+    @options_to_test %{
+      wrap_text: @boolean_values,
+      font: ["Courier New"],
+      align_vertical: @boolean_values,
+      align_horizontal: @boolean_values,
+      bold: @boolean_values,
+      italic: @boolean_values,
+      underline: @boolean_values,
+      strike: @boolean_values,
+      size: [10, 25, 50],
+      color: ["#ffff00"],
+      bg_color: ["#ffff00"],
+      num_format: ["0.00"],
+      datetime: @boolean_values,
+      yyyymmdd: @boolean_values
+    }
+
+    # Testing the options are set with content
+    for {key, values} <- @options_to_test do
+      for value <- values do
+        test "#{key}: #{value}" do
+          assert_options_set_correct_values_with_content({unquote(key), unquote(value)})
+        end
+      end
+    end
+
+    # Testing the options are reset with nil with content
+    for option <- @options_to_test |> Map.keys() do
+      test "#{option}: is reset on nil and produces only content" do
+        assert_option_not_set_with_content(unquote(option))
+      end
+    end
+  end
+
+  defp assert_options_set_correct_values_with_content({_option, _value} = options_tuple) do
+    # A key value (f.e. {:wrap_text, true}) with content being present should produce
+    # a list of content and tuple {key, value}, (except nil value which resets the style)
+    content = "example"
+
+    assert [options_tuple]
+           |> Map.new()
+           |> Map.put(:content, content)
+           |> CellDef.new()
+           |> CellDef.to_elixlsx_cell_def() === [content, options_tuple]
+  end
+
+  defp assert_option_not_set_with_content(option) do
+    # A key value (f.e. {:wrap_text, nil}) with content being present should produce
+    # only the content as [content]
+    content = "example"
+
+    assert [{option, nil}]
+           |> Map.new()
+           |> Map.put(:content, content)
+           |> CellDef.new()
+           |> CellDef.to_elixlsx_cell_def() === [content]
+  end
 end
