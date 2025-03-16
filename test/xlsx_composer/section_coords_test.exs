@@ -1,7 +1,7 @@
 defmodule XLSXComposer.SectionCoordsTest do
   alias XLSXComposer.SectionCoords
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   doctest XLSXComposer.SectionCoords
 
