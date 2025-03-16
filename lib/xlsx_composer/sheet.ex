@@ -16,7 +16,7 @@ defmodule XLSXComposer.Sheet do
 
   @type new_attrs() :: %{
           name: String.t(),
-          excel_cells: CellDef.excel_cells()
+          sections: [Section.t()]
         }
 
   @type excel_cell_by_row_idx() :: %{
