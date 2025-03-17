@@ -227,6 +227,36 @@ defmodule XLSXComposer.SectionTest do
              }
     end
 
+    test "one column scenario", ctx do
+      # -------------------
+      # |XX|A2|XX|A4|XX|XX|
+      # -------------------
+
+      top_left = ExcelCoords.new({1, 1})
+
+      cells =
+        %{
+          SectionCoords.new(0, 0) => ctx.c1_def,
+          SectionCoords.new(0, 2) => ctx.c2_def,
+          SectionCoords.new(0, 4) => ctx.c3_def,
+          SectionCoords.new(0, 5) => ctx.c4_def
+        }
+
+      assert %{
+               name: ctx.section_1_name,
+               top_left: top_left,
+               cells: cells
+             }
+             |> Section.new()
+             |> then(&[&1])
+             |> Section.reduce_to_excel_cells() === %{
+               ExcelCoords.new(1, 1) => ctx.c1_def,
+               ExcelCoords.new(1, 3) => ctx.c2_def,
+               ExcelCoords.new(1, 5) => ctx.c3_def,
+               ExcelCoords.new(1, 6) => ctx.c4_def
+             }
+    end
+
     test "multiple cells, none of them in the right bottom corner, yet the value is calculated correctly",
          ctx do
       # ----------
