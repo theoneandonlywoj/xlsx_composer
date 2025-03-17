@@ -27,7 +27,7 @@ defmodule XLSXComposer.Sheet do
             excel_cells: %{},
             max_row_idx: 0
 
-  @spec new(new_attrs()) :: {:ok, Sheet.t()} | {:error, term()}
+  @spec new(new_attrs()) :: Sheet.t()
   def new(args) do
     sections = args[:sections] || []
 
@@ -49,12 +49,6 @@ defmodule XLSXComposer.Sheet do
       excel_cells: excel_cells,
       max_row_idx: max_row_idx
     }
-    |> validate()
-  end
-
-  @spec validate(Sheet.t()) :: {:ok, Sheet.t()} | {:error, term()}
-  def validate(%Sheet{} = sheet) do
-    {:ok, sheet}
   end
 
   @spec to_elixlsx_rows(Sheet.t()) :: []
