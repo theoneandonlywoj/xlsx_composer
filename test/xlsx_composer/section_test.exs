@@ -228,9 +228,14 @@ defmodule XLSXComposer.SectionTest do
     end
 
     test "one column scenario", ctx do
-      # -------------------
-      # |XX|A2|XX|A4|XX|XX|
-      # -------------------
+      # ----------
+      # |XX|A2|A3|
+      # |B1|B2|B3|
+      # |XX|C2|C3|
+      # |D1|D2|D3|
+      # |XX|E2|E3|
+      # |XX|F2|F3|
+      # ----------
 
       top_left = ExcelCoords.new({1, 1})
 
