@@ -290,5 +290,35 @@ defmodule XLSXComposer.SectionTest do
                ExcelCoords.new(2, 3) => ctx.c2_def
              }
     end
+
+    test "multiple cells, starts from C3", ctx do
+      # ----------------
+      # |A1|A2|A3|A4|A5|
+      # |B1|B2|B3|B4|B5|
+      # |C1|C2|C3|C4|C5|
+      # |D1|D2|D3|D4|XX|
+      # |E1|E2|E3|XX|E5|
+      # ----------------
+
+      top_left = ExcelCoords.new({3, 3})
+
+      cells =
+        %{
+          SectionCoords.new(2, 1) => ctx.c1_def,
+          SectionCoords.new(1, 2) => ctx.c2_def
+        }
+
+      assert %{
+               name: ctx.section_1_name,
+               top_left: top_left,
+               cells: cells
+             }
+             |> Section.new()
+             |> then(&[&1])
+             |> Section.reduce_to_excel_cells() === %{
+               ExcelCoords.new(5, 4) => ctx.c1_def,
+               ExcelCoords.new(4, 5) => ctx.c2_def
+             }
+    end
   end
 end
