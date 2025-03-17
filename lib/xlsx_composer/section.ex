@@ -65,6 +65,16 @@ defmodule XLSXComposer.Section do
     |> then(&ExcelCoords.displace(top_left, &1))
   end
 
+  @spec reduce_to_excel_cells([Section.t()]) :: CellDef.excel_cells()
+  def reduce_to_excel_cells(sections) do
+    sections
+    |> Enum.uniq_by(& &1.name)
+    |> Enum.map(&Section.to_excel_cells/1)
+    |> Enum.reduce(%{}, fn excel_cells, acc ->
+      Map.merge(acc, excel_cells)
+    end)
+  end
+
   @spec overlap?(Section.t(), Section.t()) :: any()
   def overlap?(%Section{} = section_1, %Section{} = section_2) do
     # section 2 top left inside section 1
