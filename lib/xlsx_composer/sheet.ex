@@ -36,17 +36,9 @@ defmodule XLSXComposer.Sheet do
       |> Enum.map(& &1.bottom_right.y)
       |> Enum.max()
 
-    excel_cells =
-      sections
-      |> Enum.uniq_by(& &1.name)
-      |> Enum.map(&Section.to_excel_cells/1)
-      |> Enum.reduce(%{}, fn excel_cells, acc ->
-        Map.merge(acc, excel_cells)
-      end)
-
     %Sheet{
       name: args[:name] || "",
-      excel_cells: excel_cells,
+      excel_cells: Section.reduce_to_excel_cells(sections),
       max_row_idx: max_row_idx
     }
   end
