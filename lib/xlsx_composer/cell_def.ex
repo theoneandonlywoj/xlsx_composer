@@ -36,7 +36,27 @@ defmodule XLSXComposer.CellDef do
           configuration: %{String.t() => any()}
         }
 
-  @type style_options() ::
+  @type new_attrs() :: %{
+          optional(:content) => content(),
+          optional(:wrap_text) => boolean(),
+          optional(:font) => String.t(),
+          optional(:align_vertical) => boolean(),
+          optional(:align_horizontal) => boolean(),
+          optional(:bold) => boolean(),
+          optional(:italic) => boolean(),
+          optional(:underline) => boolean(),
+          optional(:strike) => boolean(),
+          optional(:size) => pos_integer(),
+          optional(:color) => String.t(),
+          optional(:bg_color) => String.t(),
+          optional(:num_format) => String.t(),
+          optional(:datetime) => boolean(),
+          optional(:yyyymmdd) => String.t(),
+          optional(:border) => Keyword.t(),
+          optional(:configuration) => %{String.t() => any()}
+        }
+
+  @type style_option() ::
           {:wrap_text, boolean()}
           | {:font, String.t()}
           | {:align_vertical, boolean()}
@@ -51,10 +71,12 @@ defmodule XLSXComposer.CellDef do
           | {:num_format, String.t()}
           | {:datetime, boolean()}
           | {:yyyymmdd, boolean()}
+
   @type border_style() :: list()
 
   @type content() :: any()
-  @type elixlsx_definition() :: [content() | {style_options(), any()}]
+
+  @type elixlsx_definition() :: [content() | {style_option(), any()}]
 
   @type section_cells() :: %{SectionCoords.t() => CellDef.t()}
 
@@ -102,11 +124,11 @@ defmodule XLSXComposer.CellDef do
             # Configuration
             configuration: %{}
 
-  @spec build(map()) :: t()
-  def build(args \\ %{}) do
+  @spec new(new_attrs()) :: t()
+  def new(args \\ %{}) do
     %CellDef{
       # Content / Text
-      content: args[:content] || "",
+      content: args[:content] || nil,
       wrap_text: args[:wrap_text],
       font: args[:font],
       # Align
@@ -136,7 +158,7 @@ defmodule XLSXComposer.CellDef do
   @spec set_content(CellDef.t(), content()) :: CellDef.t()
   def set_content(%CellDef{} = cell_def, content), do: %CellDef{cell_def | content: content}
 
-  @spec set_style_option(CellDef.t(), style_options()) :: CellDef.t()
+  @spec set_style_option(CellDef.t(), style_option()) :: CellDef.t()
   def set_style_option(%CellDef{} = cell_def, {option, value}) do
     Map.put(cell_def, option, value)
   end
@@ -155,7 +177,7 @@ defmodule XLSXComposer.CellDef do
 
   @spec displace(ExcelCoords.t(), SectionCoords.t()) :: ExcelCoords.t()
   def displace(%ExcelCoords{} = excel_coords, %SectionCoords{} = section_cords) do
-    ExcelCoords.build(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
+    ExcelCoords.new(excel_coords.x + section_cords.x, excel_coords.y + section_cords.y)
   end
 
   @spec to_elixlsx_cell_def(CellDef.t() | nil) :: elixlsx_definition() | nil

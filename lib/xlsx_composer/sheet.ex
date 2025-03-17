@@ -14,6 +14,11 @@ defmodule XLSXComposer.Sheet do
           max_row_idx: integer()
         }
 
+  @type new_attrs() :: %{
+          name: String.t(),
+          sections: [Section.t()]
+        }
+
   @type excel_cell_by_row_idx() :: %{
           integer() => [CellDef.excel_cells()]
         }
@@ -22,8 +27,8 @@ defmodule XLSXComposer.Sheet do
             excel_cells: %{},
             max_row_idx: 0
 
-  @spec build(map()) :: {:ok, Sheet.t()} | {:error, term()}
-  def build(args) do
+  @spec new(new_attrs()) :: Sheet.t()
+  def new(args) do
     sections = args[:sections] || []
 
     max_row_idx =
@@ -31,25 +36,11 @@ defmodule XLSXComposer.Sheet do
       |> Enum.map(& &1.bottom_right.y)
       |> Enum.max()
 
-    excel_cells =
-      sections
-      |> Enum.uniq_by(& &1.name)
-      |> Enum.map(&Section.to_excel_cells/1)
-      |> Enum.reduce(%{}, fn excel_cells, acc ->
-        Map.merge(acc, excel_cells)
-      end)
-
     %Sheet{
       name: args[:name] || "",
-      excel_cells: excel_cells,
+      excel_cells: Section.reduce_to_excel_cells(sections),
       max_row_idx: max_row_idx
     }
-    |> validate()
-  end
-
-  @spec validate(Sheet.t()) :: {:ok, Sheet.t()} | {:error, term()}
-  def validate(%Sheet{} = sheet) do
-    {:ok, sheet}
   end
 
   @spec to_elixlsx_rows(Sheet.t()) :: []
