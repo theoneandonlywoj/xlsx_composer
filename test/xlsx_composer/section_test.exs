@@ -321,4 +321,124 @@ defmodule XLSXComposer.SectionTest do
              }
     end
   end
+
+  describe "just_below/1 and just_below/2" do
+    test "just below to an empty section" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(1, 1)
+
+      # Correct just below point will jump one cell below the original top_left
+      # opts are not supplied so the default is (0, 0)
+      correct_just_below = ExcelCoords.new(1, 2)
+
+      assert correct_just_below ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_below()
+    end
+
+    test "just below to an non-empty section" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(3, 3)
+
+      # Correct just below point will jump one cell below the original top_left
+      # opts are not supplied so the default is (0, 0)
+      correct_just_below = ExcelCoords.new(1, 4)
+
+      assert correct_just_below ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_below()
+    end
+
+    test "just below to an empty section, with opts" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(1, 1)
+
+      # Correct just below point will jump one cell below the original top_left
+      # opts are supplied
+      correct_just_below = ExcelCoords.new(2, 4)
+
+      assert correct_just_below ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_below(move_x: 1, move_y: 2)
+    end
+
+    test "just below to an non-empty section, with opts" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(3, 3)
+
+      # Correct just below point will jump one cell below the original top_left
+      # opts are supplied
+      correct_just_below = ExcelCoords.new(2, 7)
+
+      assert correct_just_below ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_below(move_x: 1, move_y: 3)
+    end
+  end
+
+  describe "just_to_the_right/0 and just_to_the_right/2" do
+    test "just_to_the_right to an empty section" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(1, 1)
+      correct_just_to_the_right = ExcelCoords.new(2, 1)
+
+      assert correct_just_to_the_right ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_to_the_right()
+    end
+
+    test "just_to_the_right to an non-empty section" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(3, 3)
+      correct_just_to_the_right = ExcelCoords.new(4, 3)
+
+      assert correct_just_to_the_right ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_to_the_right()
+    end
+
+    test "just below to an empty section, with opts" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(1, 1)
+      correct_just_to_the_right = ExcelCoords.new(3, 3)
+
+      assert correct_just_to_the_right ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_to_the_right(move_x: 1, move_y: 2)
+    end
+
+    test "just below to an non-empty section, with opts" do
+      top_left = ExcelCoords.new(1, 1)
+      bottom_right = ExcelCoords.new(3, 3)
+      correct_just_to_the_right = ExcelCoords.new(5, 6)
+
+      assert correct_just_to_the_right ===
+               %Section{
+                 top_left: top_left,
+                 bottom_right: bottom_right
+               }
+               |> Section.just_to_the_right(move_x: 1, move_y: 3)
+    end
+  end
 end
