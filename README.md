@@ -1,6 +1,5 @@
 # XLSXComposer
-
-**TODO: Add description**
+An wrapper arround `elixlsx` that focuses on readability and performance (`elixlsx` suffers big penalties when using a lot of `set_cell/2`)
 
 ## Installation
 
@@ -10,7 +9,7 @@ by adding `xlsx_composer` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:xlsx_composer, "~> 0.1.0"}
+    {:xlsx_composer, "~> 0.3.0"}
   ]
 end
 ```
