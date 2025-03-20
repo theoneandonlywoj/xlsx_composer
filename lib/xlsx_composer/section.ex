@@ -83,12 +83,15 @@ defmodule XLSXComposer.Section do
   |E1|TB|E3|E4|E5|
   ----------------
   """
-  @spec just_below(Section.t()) :: ExcelCoords.t()
-  def just_below(%Section{} = section, opts \\ []) do
+  @spec below(Section.t()) :: ExcelCoords.t()
+  def below(%Section{} = section, opts \\ []) do
     move_x = Keyword.get(opts, :move_x, 0)
     move_y = Keyword.get(opts, :move_y, 0)
 
-    ExcelCoords.new(section.top_left.x + move_x, section.bottom_right.y + 1 + move_y)
+    ExcelCoords.new(
+      section.top_left.x + move_x,
+      section.bottom_right.y + move_y_just_below(section) + move_y
+    )
   end
 
   @doc """
@@ -109,12 +112,15 @@ defmodule XLSXComposer.Section do
   |E1|E2|E3|E4|E5|
   ----------------
   """
-  @spec just_to_the_right(Section.t()) :: ExcelCoords.t()
-  def just_to_the_right(%Section{} = section, opts \\ []) do
+  @spec to_the_right(Section.t()) :: ExcelCoords.t()
+  def to_the_right(%Section{} = section, opts \\ []) do
     move_x = Keyword.get(opts, :move_x, 0)
     move_y = Keyword.get(opts, :move_y, 0)
 
-    ExcelCoords.new(section.bottom_right.x + 1 + move_x, section.bottom_right.y + move_y)
+    ExcelCoords.new(
+      section.bottom_right.x + move_x_just_right(section) + move_x,
+      section.top_left.y + move_y
+    )
   end
 
   @spec reduce_to_excel_cells([Section.t()]) :: CellDef.excel_cells()
@@ -153,6 +159,32 @@ defmodule XLSXComposer.Section do
     end)
     |> Map.new()
   end
+
+  @doc """
+  Identifies by how much you have to move the y value of the new Section's `top_left` point to just below another section.
+  Simply: A scenario: you want to find the `top_left` point of section_2 based of the section_1 (which is a reference here).
+  If section_1 is empty, then section_2 can start from the same `top_left`, so move by 0.
+  Otherwise, we have to move by 1.
+  """
+  @spec move_y_just_below(Section.t()) :: 0 | 1
+  def move_y_just_below(%Section{top_left: top_left, bottom_right: bottom_right} = _section)
+      when top_left == bottom_right,
+      do: 0
+
+  def move_y_just_below(%Section{} = _section), do: 1
+
+  @doc """
+  Identifies by how much you have to move the x value of the new Section's `top_left` point to just right another section.
+  Simply: A scenario: you want to find the `top_left` point of section_2 based of the section_1 (which is a reference here).
+  If section_1 is empty, then section_2 can start from the same `top_left`, so move by 0.
+  Otherwise, we have to move by 1.
+  """
+  @spec move_x_just_right(Section.t()) :: 0 | 1
+  def move_x_just_right(%Section{top_left: top_left, bottom_right: bottom_right} = _section)
+      when top_left == bottom_right,
+      do: 0
+
+  def move_x_just_right(%Section{} = _section), do: 1
 
   @spec pick_higher_int(non_neg_integer(), non_neg_integer()) :: non_neg_integer()
   defp pick_higher_int(int_1, int_2) when int_1 > int_2, do: int_1
