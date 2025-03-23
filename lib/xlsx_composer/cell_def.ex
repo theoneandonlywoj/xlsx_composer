@@ -14,8 +14,8 @@ defmodule XLSXComposer.CellDef do
           wrap_text: boolean() | nil,
           font: String | nil,
           # Align
-          align_vertical: boolean() | nil,
-          align_horizontal: boolean() | nil,
+          align_vertical: align_vertical() | nil,
+          align_horizontal: align_horizontal() | nil,
           # Style
           bold: boolean() | nil,
           italic: boolean() | nil,
@@ -40,8 +40,8 @@ defmodule XLSXComposer.CellDef do
           optional(:content) => content(),
           optional(:wrap_text) => boolean(),
           optional(:font) => String.t(),
-          optional(:align_vertical) => boolean(),
-          optional(:align_horizontal) => boolean(),
+          optional(:align_vertical) => align_vertical(),
+          optional(:align_horizontal) => align_horizontal(),
           optional(:bold) => boolean(),
           optional(:italic) => boolean(),
           optional(:underline) => boolean(),
@@ -59,8 +59,8 @@ defmodule XLSXComposer.CellDef do
   @type style_option() ::
           {:wrap_text, boolean()}
           | {:font, String.t()}
-          | {:align_vertical, boolean()}
-          | {:align_horizontal, boolean()}
+          | {:align_vertical, align_horizontal()}
+          | {:align_horizontal, align_vertical()}
           | {:bold, boolean()}
           | {:italic, boolean()}
           | {:underline, boolean()}
@@ -71,6 +71,10 @@ defmodule XLSXComposer.CellDef do
           | {:num_format, String.t()}
           | {:datetime, boolean()}
           | {:yyyymmdd, boolean()}
+
+  @type align_horizontal() :: :left | :right | :center | :justify | :general | :fill
+
+  @type align_vertical() :: :top | :bottom | :center
 
   @type border_style() :: list()
 

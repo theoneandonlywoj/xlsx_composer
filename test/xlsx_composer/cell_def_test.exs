@@ -39,7 +39,7 @@ defmodule XLSXComposer.CellDefTest do
 
     # Align Vertical
     test "news for provided align_vertical and sets :align_vertical" do
-      value = true
+      value = :center
       key = :align_vertical
 
       assert Map.new()
@@ -49,7 +49,7 @@ defmodule XLSXComposer.CellDefTest do
 
     # Align Horizontal
     test "news for provided align_horizontal and sets :align_horizontal" do
-      value = true
+      value = :fill
       key = :align_horizontal
 
       assert Map.new()
@@ -234,11 +234,14 @@ defmodule XLSXComposer.CellDefTest do
 
     @boolean_values [true, false]
 
+    @align_horizontal_values [:left, :right, :center, :justify, :general, :fill]
+    @align_vertical_values [:top, :bottom, :center]
+
     @options_to_test %{
       wrap_text: @boolean_values,
       font: ["Courier New"],
-      align_vertical: @boolean_values,
-      align_horizontal: @boolean_values,
+      align_vertical: @align_vertical_values,
+      align_horizontal: @align_horizontal_values,
       bold: @boolean_values,
       italic: @boolean_values,
       underline: @boolean_values,
