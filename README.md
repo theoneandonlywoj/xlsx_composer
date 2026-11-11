@@ -44,10 +44,12 @@ track releases.
 
 ## Releasing
 
-Run `make release-test` to test the release command with isolated Git repositories
-and fake publishers. It does not need credentials or publish anything publicly.
+Both release targets are self-contained bash in the `Makefile`. Run
+`make release-test` to test the release command with isolated Git repositories
+and fake publishers (it needs bash, Git, Make and `jq`). It does not need
+credentials or publish anything publicly.
 
-For a real release, use the pinned development toolchain, Python 3, Git, Make,
+For a real release, use the pinned development toolchain, bash, Git, Make, `curl`, `jq`,
 GitHub CLI (`gh`), Hex/Rebar and installed dependencies, including ExDoc. Start
 from clean, attached `main`, synchronized with the single origin push destination.
 Configure Git commit identity, Git push access and `gh` authentication with access
@@ -79,9 +81,8 @@ atomically. It then creates the GitHub Release with generated notes and runs
 `mix hex.publish --yes` with ExDoc available. Success additionally requires public
 Hex metadata for the exact version with `has_docs=true`.
 
-Public verification polls for up to a 60-second application budget with socket
-inactivity timeouts of at most 10 seconds. This is not hard cancellation of a slow
-streaming HTTP response. A timeout, staged approval policy or network failure can
+Public verification polls for up to 60 seconds; each request is cut off after at
+most 10 seconds or the remaining budget. A timeout, staged approval policy or network failure can
 leave an upload present while completion is unverified. A nonzero Hex command
 also remains a failure even if an upload landed.
 

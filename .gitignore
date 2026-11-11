@@ -25,6 +25,3 @@ xlsx_composer-*.tar
 # Dialyzer's generated PLT and metadata.
 /priv/plts/
 
-# Python automation caches.
-__pycache__/
-*.py[cod]

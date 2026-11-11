@@ -39,7 +39,7 @@ jobs:
           fi
 
       # The default ref/SHA is this event's: rerunning checks out the original
-      # commit on attached main, never today's main. scripts/release.py then
+      # commit on attached main, never today's main. make release then
       # refuses if origin/main has advanced. Tags and history are needed for the
       # target-tag checks and the release commit.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
