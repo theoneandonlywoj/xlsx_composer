@@ -5,7 +5,11 @@ defmodule XLSXComposer.CellDef do
 
   Colors are `"#RRGGBB"` strings. For dates, set `num_format` to a date pattern
   such as `"mm/dd/yyyy"`; `datetime` and `yyyymmdd` are truthy flags that
-  override `num_format` with ISO formats.
+  override `num_format` with ISO formats. Elixlsx's `num_format`
+  counts as a date format only if it contains `"yy"` (case-sensitive, e.g.
+  `"mm/dd/yyyy"`). A pattern without it, such as `"mmm d"`, makes tuple date
+  content raise at write time, and unix-seconds content is written as a plain
+  number.
 
   `:configuration` is a map for tagging cells, e.g. to collect them later and
   apply an additional style; it is not written to the file.

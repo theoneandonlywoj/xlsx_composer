@@ -68,6 +68,8 @@ Write it with `XLSXComposer.write/2`:
   wherever the header moves.
 - B3 shows `07/04/2024`.
 - C3 shows `1,234.57` on light yellow.
+- Excel shows `/`, `,` and `.` using the reader's locale; en-US shows
+  `07/04/2024` and `1,234.57`.
 - The body has a thin outline, except C3's bottom, which keeps its own double red
   line: cell sides win over the section border.
 
@@ -78,11 +80,13 @@ the sections into Excel coordinates.
 ## US formats
 
 - Use `num_format: "mm/dd/yyyy"` alone. `datetime: true` and `yyyymmdd: true`
-  override `num_format` with ISO formats.
+  override `num_format` with ISO formats. `num_format`
+  counts as a date format only if it contains `"yy"` (case-sensitive).
 - Date content must be an Erlang tuple `{{y, m, d}, {h, m, s}}` or an integer of
   unix seconds. Convert a `NaiveDateTime` with `NaiveDateTime.to_erl/1` and a
   `Date` with `{Date.to_erl(date), {0, 0, 0}}`. Passing the structs raises at
   write time.
 - The custom format string (month/day/year order) is stored in the file, though
   Excel may show the `/` separator using the reader's locale.
-- `num_format: "#,##0.00"` gives a thousands separator and two decimals.
+- `num_format: "#,##0.00"` gives a thousands separator and two decimals; Excel
+  shows `,` and `.` using the reader's locale (en-US shows `1,234.57`).
