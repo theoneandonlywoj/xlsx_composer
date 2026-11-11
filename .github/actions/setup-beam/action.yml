@@ -1,0 +1,65 @@
+name: Set up BEAM
+description: Install Erlang/OTP and Elixir from .tool-versions, Hex/Rebar and cached dependencies
+
+inputs:
+  plt:
+    description: Also restore (or build on a miss) the Dialyzer PLT in priv/plts
+    default: "false"
+
+outputs:
+  elixir-version:
+    description: Installed Elixir version
+    value: ${{ steps.setup-beam.outputs.elixir-version }}
+  otp-version:
+    description: Installed OTP version
+    value: ${{ steps.setup-beam.outputs.otp-version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Erlang/OTP and Elixir
+      id: setup-beam
+      uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
+      with:
+        version-file: .tool-versions
+        version-type: strict
+
+    - name: Retrieve cached dependencies
+      id: mix-cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          deps
+          _build
+        key: mix-${{ runner.os }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ hashFiles('mix.lock') }}
+
+    # Archives live outside the cached paths, so every fresh runner installs
+    # them, including on a cache hit.
+    - name: Install Hex/Rebar and fetch dependencies
+      shell: bash
+      run: |
+        mix local.hex --force
+        mix local.rebar --force
+        mix deps.get
+
+    - name: Compile dependencies
+      if: steps.mix-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        MIX_ENV=dev mix deps.compile
+        MIX_ENV=test mix deps.compile
+
+    - name: Retrieve cached PLT
+      id: plt-cache
+      if: inputs.plt == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: priv/plts
+        key: plt-${{ runner.os }}-${{ steps.setup-beam.outputs.otp-version }}-${{ steps.setup-beam.outputs.elixir-version }}-${{ hashFiles('mix.lock') }}
+
+    - name: Build Dialyzer PLT
+      if: inputs.plt == 'true' && steps.plt-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p priv/plts
+        mix dialyzer --plt
