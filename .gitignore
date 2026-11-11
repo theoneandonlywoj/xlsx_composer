@@ -21,3 +21,10 @@ xlsx_composer-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Dialyzer's generated PLT and metadata.
+/priv/plts/
+
+# Python automation caches.
+__pycache__/
+*.py[cod]
