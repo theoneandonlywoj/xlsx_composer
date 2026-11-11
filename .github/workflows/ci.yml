@@ -2,174 +2,87 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+# Only a superseded pull request run is cancelled; main runs always finish.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
+  release-automation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: make release-test
+
   dependencies:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: ['1.18.2-otp-27']
-        otp: ['27.3']
+    runs-on: ubuntu-24.04
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout Github repo
-        uses: actions/checkout@v2
-      - name: Sets up an Erlang/OTP environment
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v4
-        id: mix-cache
-        with:
-          path: |
-            deps
-            _build
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-      - name: Install dependencies
-        if: steps.mix-cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p priv/plts
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
-          mix deps.compile
-          mix dialyzer --plt
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
+      - run: mix deps.unlock --check-unused
 
-  compile-dev:
-    permissions: write-all
+  compile:
     needs: dependencies
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: ['1.18.2-otp-27']
-        otp: ['27.3']
+    runs-on: ubuntu-24.04
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout Github repo
-        uses: actions/checkout@v2
-      - name: Sets up an Erlang/OTP environment
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v4
-        id: mix-cache
-        with:
-          path: |
-            deps
-            _build
-            priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-      - run: mix deps.get
-      - run: MIX_ENV=dev mix compile
-
-  compile-test:
-    permissions: write-all
-    needs: dependencies
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: ['1.18.2-otp-27']
-        otp: ['27.3']
-    steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout Github repo
-        uses: actions/checkout@v2
-      - name: Sets up an Erlang/OTP environment
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v4
-        id: mix-cache
-        with:
-          path: |
-            deps
-            _build
-            priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-      - run: mix deps.get
-      - run: MIX_ENV=test mix compile
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
+      - run: mix compile --force --warnings-as-errors
+        env:
+          MIX_ENV: dev
+      - run: mix compile --force --warnings-as-errors
+        env:
+          MIX_ENV: test
 
   static-code-analysis:
-    permissions: write-all
-    needs: [compile-dev, compile-test]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        elixir: ['1.18.2-otp-27']
-        otp: ['27.3']
+    needs: dependencies
+    runs-on: ubuntu-24.04
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
         with:
-          access_token: ${{ github.token }}
-      - name: Checkout Github repo
-        uses: actions/checkout@v2
-      - name: Sets up an Erlang/OTP environment
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v4
-        id: mix-cache
-        with:
-          path: |
-            deps
-            _build
-            priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-#      - run: mix deps.get
-      - run: mix format --check-formatted
-      - run: mix credo --strict
-      - run: mix dialyzer
+          plt: "true"
+      # Warning-fatal compilation, formatting, strict Credo and Dialyzer.
+      - run: make quality
+      - run: mix docs --warnings-as-errors
+
+  package:
+    needs: dependencies
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
+      # Builds the Hex package and compiles it as a fresh host's only dependency.
+      - run: scripts/package_check.sh
 
   mix-test:
-    permissions: write-all
-    runs-on: ubuntu-latest
-    needs: static-code-analysis
-    strategy:
-      matrix:
-        elixir: ['1.18.2-otp-27']
-        otp: ['27.3']
+    needs: dependencies
+    runs-on: ubuntu-24.04
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.9.0
-        with:
-          access_token: ${{ github.token }}
-      - name: Checkout Github repo
-        uses: actions/checkout@v2
-      - name: Sets up an Erlang/OTP environment
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
-      - name: Retrieve cached dependencies
-        uses: actions/cache@v4
-        id: mix-cache
-        with:
-          path: |
-            deps
-            _build
-            priv/plts
-          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('mix.lock') }}
-#      - run: mix deps.get
-      - run: mix test --trace --slowest 10
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
+      - run: mix test
+
+  # Advisory only: the report goes to the job summary and never fails CI.
+  outdated-dependencies:
+    needs: dependencies
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-beam
+      - name: Report outdated dependencies
+        run: |
+          {
+            echo "## Outdated dependencies (advisory)"
+            echo '```'
+            mix hex.outdated 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
