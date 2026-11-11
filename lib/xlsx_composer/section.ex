@@ -4,7 +4,11 @@ defmodule XLSXComposer.Section do
 
   WARNING! : limit number of Sections otherwise the process of the checks might hurt your performance!
   Soon, implementation of checking of Sections overlap will have to be done so use Section carefully.
+
+  `section_border` adds outward-facing cardinal sides in the default `:outline`
+  mode, or every supplied side in `:all` mode. Existing cell sides take precedence.
   """
+  alias XLSXComposer.BorderDef
   alias XLSXComposer.CellDef
   alias XLSXComposer.ExcelCoords
   alias XLSXComposer.Section
@@ -14,13 +18,17 @@ defmodule XLSXComposer.Section do
           name: name_t(),
           cells: CellDef.section_cells(),
           top_left: ExcelCoords.t(),
-          bottom_right: ExcelCoords.t()
+          bottom_right: ExcelCoords.t(),
+          section_border: BorderDef.t() | keyword() | nil,
+          section_border_mode: :outline | :all
         }
 
   @type new_attrs() :: %{
-          name: name_t(),
-          top_left: ExcelCoords.t(),
-          cells: CellDef.section_cells()
+          optional(:section_border) => BorderDef.t() | keyword() | nil,
+          optional(:section_border_mode) => :outline | :all,
+          :name => name_t(),
+          :top_left => ExcelCoords.t(),
+          :cells => CellDef.section_cells()
         }
 
   @type name_t() :: String.t()
@@ -30,18 +38,65 @@ defmodule XLSXComposer.Section do
   defstruct name: "",
             cells: %{},
             top_left: ExcelCoords.new(),
-            bottom_right: ExcelCoords.new()
+            bottom_right: ExcelCoords.new(),
+            section_border: nil,
+            section_border_mode: :outline
 
+  @doc "Creates a section and applies its border before calculating its extent."
   @spec new(new_attrs()) :: Section.t()
   def new(args) do
     top_left = args[:top_left] || ExcelCoords.new()
-    cells = args[:cells] || %{}
+    section_border = args[:section_border]
+    section_border_mode = if args[:section_border_mode] == :all, do: :all, else: :outline
+
+    cells =
+      (args[:cells] || %{})
+      |> apply_section_border(section_border, section_border_mode)
 
     %Section{
       name: args.name,
       cells: cells,
       top_left: top_left,
-      bottom_right: calculate_bottom_right(top_left, cells)
+      bottom_right: calculate_bottom_right(top_left, cells),
+      section_border: section_border,
+      section_border_mode: section_border_mode
+    }
+  end
+
+  defp apply_section_border(cells, nil, _mode), do: cells
+  defp apply_section_border(cells, _border, _mode) when cells == %{}, do: cells
+
+  defp apply_section_border(cells, section_border, mode) do
+    section_border = BorderDef.normalize(section_border)
+    bounds = bounds(cells)
+
+    Map.new(cells, fn {coords, %CellDef{} = cell_def} ->
+      contribution =
+        case mode do
+          :all -> section_border
+          :outline -> outline_contribution(section_border, coords, bounds)
+        end
+
+      {coords, %CellDef{cell_def | border: BorderDef.merge(cell_def.border, contribution)}}
+    end)
+  end
+
+  defp bounds(cells) do
+    xs = Enum.map(cells, fn {%SectionCoords{x: x}, _} -> x end)
+    ys = Enum.map(cells, fn {%SectionCoords{y: y}, _} -> y end)
+    {Enum.min(xs), Enum.max(xs), Enum.min(ys), Enum.max(ys)}
+  end
+
+  defp outline_contribution(
+         %BorderDef{} = border,
+         %SectionCoords{} = coords,
+         {min_x, max_x, min_y, max_y}
+       ) do
+    %BorderDef{
+      left: if(coords.x == min_x, do: border.left, else: nil),
+      right: if(coords.x == max_x, do: border.right, else: nil),
+      top: if(coords.y == min_y, do: border.top, else: nil),
+      bottom: if(coords.y == max_y, do: border.bottom, else: nil)
     }
   end
 
