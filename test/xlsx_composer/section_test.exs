@@ -607,7 +607,6 @@ defmodule XLSXComposer.SectionTest do
       top_left = ExcelCoords.new(1, 1)
       bottom_right = ExcelCoords.new(1, 1)
 
-      # Correct just below point is one cell below the section above if the section above is not empty.
       correct_just_below = ExcelCoords.new(1, 1)
 
       assert correct_just_below ===
@@ -618,26 +617,17 @@ defmodule XLSXComposer.SectionTest do
                |> Section.below()
     end
 
-    test "below to an non-empty section" do
-      top_left = ExcelCoords.new(1, 1)
-      bottom_right = ExcelCoords.new(3, 3)
-
+    test "below to an non-empty section", ctx do
       # Correct just below point is one cell below the section above if the section above is not empty.
       correct_just_below = ExcelCoords.new(1, 4)
 
-      assert correct_just_below ===
-               %Section{
-                 top_left: top_left,
-                 bottom_right: bottom_right
-               }
-               |> Section.below()
+      assert correct_just_below === ctx |> non_empty_section() |> Section.below()
     end
 
     test "below to an empty section with opts" do
       top_left = ExcelCoords.new(1, 1)
       bottom_right = ExcelCoords.new(1, 1)
 
-      # Correct just below point is one cell below the section above if the section above is not empty.
       correct_just_below = ExcelCoords.new(3, 3)
 
       assert correct_just_below ===
@@ -648,19 +638,44 @@ defmodule XLSXComposer.SectionTest do
                |> Section.below(move_x: 2, move_y: 2)
     end
 
-    test "below to an non-empty section with opts" do
-      top_left = ExcelCoords.new(1, 1)
-      bottom_right = ExcelCoords.new(3, 3)
-
+    test "below to an non-empty section with opts", ctx do
       # Correct just below point is one cell below the section above if the section above is not empty.
       correct_just_below = ExcelCoords.new(3, 6)
 
       assert correct_just_below ===
-               %Section{
-                 top_left: top_left,
-                 bottom_right: bottom_right
-               }
-               |> Section.below(move_x: 2, move_y: 2)
+               ctx |> non_empty_section() |> Section.below(move_x: 2, move_y: 2)
+    end
+
+    test "below a one-cell section is the next row", ctx do
+      one = one_cell_section(ctx)
+
+      assert Section.below(one) === ExcelCoords.new(2, 3)
+      assert Section.below(one, move_x: 2, move_y: 2) === ExcelCoords.new(4, 5)
+    end
+
+    test "a section placed below a one-cell section keeps both cells", ctx do
+      title = one_cell_section(ctx)
+
+      table =
+        Section.new(%{
+          name: "table",
+          top_left: Section.below(title),
+          cells: %{SectionCoords.new(0, 0) => ctx.c2_def}
+        })
+
+      refute Section.overlap?(title, table)
+
+      assert Section.reduce_to_excel_cells([title, table]) === %{
+               ExcelCoords.new(2, 2) => ctx.c1_def,
+               ExcelCoords.new(2, 3) => ctx.c2_def
+             }
+    end
+
+    test "a hand-built section with no cells is empty whatever its corners" do
+      section = %Section{top_left: ExcelCoords.new(1, 1), bottom_right: ExcelCoords.new(3, 3)}
+
+      assert Section.below(section) === ExcelCoords.new(1, 3)
+      assert Section.to_the_right(section) === ExcelCoords.new(3, 1)
     end
   end
 
@@ -678,17 +693,10 @@ defmodule XLSXComposer.SectionTest do
                |> Section.to_the_right()
     end
 
-    test "to_the_right to an non-empty section" do
-      top_left = ExcelCoords.new(1, 1)
-      bottom_right = ExcelCoords.new(3, 3)
+    test "to_the_right to an non-empty section", ctx do
       correct_just_to_the_right = ExcelCoords.new(4, 1)
 
-      assert correct_just_to_the_right ===
-               %Section{
-                 top_left: top_left,
-                 bottom_right: bottom_right
-               }
-               |> Section.to_the_right()
+      assert correct_just_to_the_right === ctx |> non_empty_section() |> Section.to_the_right()
     end
 
     test "to_the_right to an empty section with opts" do
@@ -704,17 +712,52 @@ defmodule XLSXComposer.SectionTest do
                |> Section.to_the_right(move_x: 2, move_y: 2)
     end
 
-    test "to_the_right to an non-empty section with opts" do
-      top_left = ExcelCoords.new(1, 1)
-      bottom_right = ExcelCoords.new(3, 3)
+    test "to_the_right to an non-empty section with opts", ctx do
       correct_just_to_the_right = ExcelCoords.new(6, 3)
 
       assert correct_just_to_the_right ===
-               %Section{
-                 top_left: top_left,
-                 bottom_right: bottom_right
-               }
-               |> Section.to_the_right(move_x: 2, move_y: 2)
+               ctx |> non_empty_section() |> Section.to_the_right(move_x: 2, move_y: 2)
     end
+
+    test "to_the_right of a one-cell section is the next column", ctx do
+      one = one_cell_section(ctx)
+
+      assert Section.to_the_right(one) === ExcelCoords.new(3, 2)
+      assert Section.to_the_right(one, move_x: 2, move_y: 2) === ExcelCoords.new(5, 4)
+    end
+
+    test "a section placed to the right of a one-cell section keeps both cells", ctx do
+      title = one_cell_section(ctx)
+
+      side =
+        Section.new(%{
+          name: "side",
+          top_left: Section.to_the_right(title),
+          cells: %{SectionCoords.new(0, 0) => ctx.c2_def}
+        })
+
+      refute Section.overlap?(title, side)
+
+      assert Section.reduce_to_excel_cells([title, side]) === %{
+               ExcelCoords.new(2, 2) => ctx.c1_def,
+               ExcelCoords.new(3, 2) => ctx.c2_def
+             }
+    end
+  end
+
+  defp one_cell_section(ctx) do
+    Section.new(%{
+      name: "one",
+      top_left: ExcelCoords.new(2, 2),
+      cells: %{SectionCoords.new(0, 0) => ctx.c1_def}
+    })
+  end
+
+  defp non_empty_section(ctx) do
+    Section.new(%{
+      name: "non_empty",
+      top_left: ExcelCoords.new(1, 1),
+      cells: %{SectionCoords.new(0, 0) => ctx.c1_def, SectionCoords.new(2, 2) => ctx.c2_def}
+    })
   end
 end

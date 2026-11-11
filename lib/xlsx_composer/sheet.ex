@@ -1,6 +1,10 @@
 defmodule XLSXComposer.Sheet do
   @moduledoc """
-  #{__MODULE__} corresponds to Elixls's Sheet and translates into that if you want to do additional stuff or if you have to work around limitations of this library.
+  A named sheet built from sections; it corresponds to Elixlsx's Sheet.
+
+  `new/1` needs at least one section. Use `to_elixlsx_sheet/1` (or
+  `XLSXComposer.to_workbook/1` for a whole workbook) to get the Elixlsx structs
+  when you need to work around limitations of this library.
   """
 
   alias XLSXComposer.CellDef

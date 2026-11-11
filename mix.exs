@@ -14,6 +14,7 @@ defmodule XLSXComposer.MixProject do
       aliases: aliases(),
       description: description(),
       package: package(),
+      docs: docs(),
       name: "xlsx_composer",
       source_url: "https://github.com/theoneandonlywoj/xlsx_composer",
       dialyzer: [plt_file: {:no_warn, "priv/plts/dialyzer.plt"}]
@@ -29,7 +30,27 @@ defmodule XLSXComposer.MixProject do
       name: "xlsx_composer",
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/theoneandonlywoj/xlsx_composer"},
-      files: ~w(lib .formatter.exs mix.exs VERSION README* LICENSE* CHANGELOG*)
+      files: ~w(lib guides .formatter.exs mix.exs VERSION README* LICENSE* CHANGELOG*)
+    ]
+  end
+
+  defp docs do
+    [
+      main: "overview",
+      source_ref: "v#{@version}",
+      extras: [
+        "guides/overview.md",
+        "guides/components.md",
+        "guides/example.md",
+        "guides/why-xlsx-composer.md",
+        "CHANGELOG.md"
+      ],
+      groups_for_extras: [Guides: ~r/guides\//],
+      groups_for_modules: [
+        Cells: [XLSXComposer.CellDef, XLSXComposer.BorderDef, XLSXComposer.BorderDef.Side],
+        Layout: [XLSXComposer.Section, XLSXComposer.SectionCoords, XLSXComposer.ExcelCoords],
+        Output: [XLSXComposer, XLSXComposer.Sheet, XLSXComposer.Sheet.Error]
+      ]
     ]
   end
 
