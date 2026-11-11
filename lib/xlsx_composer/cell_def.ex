@@ -4,6 +4,7 @@ defmodule XLSXComposer.CellDef do
 
   `:configuration` is a map of settings you might want to use to tag elements and later on, globally collect and apply an additional style if required.
   """
+  alias XLSXComposer.BorderDef
   alias XLSXComposer.CellDef
   alias XLSXComposer.ExcelCoords
   alias XLSXComposer.SectionCoords
@@ -31,7 +32,7 @@ defmodule XLSXComposer.CellDef do
           datetime: boolean() | nil,
           yyyymmdd: String.t() | nil,
           # Border
-          border: Keyword.t() | nil,
+          border: BorderDef.t() | keyword() | nil,
           # Configuration
           configuration: %{String.t() => any()}
         }
@@ -52,7 +53,7 @@ defmodule XLSXComposer.CellDef do
           optional(:num_format) => String.t(),
           optional(:datetime) => boolean(),
           optional(:yyyymmdd) => String.t(),
-          optional(:border) => Keyword.t(),
+          optional(:border) => BorderDef.t() | keyword() | nil,
           optional(:configuration) => %{String.t() => any()}
         }
 
@@ -76,7 +77,7 @@ defmodule XLSXComposer.CellDef do
 
   @type align_vertical() :: :top | :bottom | :center
 
-  @type border_style() :: list()
+  @type border_style() :: BorderDef.t() | keyword() | nil
 
   @type content() :: any()
 
@@ -202,7 +203,17 @@ defmodule XLSXComposer.CellDef do
   defp maybe_set_content(definition, nil), do: definition
   defp maybe_set_content(definition, content), do: [content] ++ definition
 
-  @spec maybe_set_border(elixlsx_definition(), nil | border_style()) :: elixlsx_definition()
+  @spec maybe_set_border(elixlsx_definition(), border_style()) :: elixlsx_definition()
+  defp maybe_set_border(definition, nil), do: definition
+  defp maybe_set_border(definition, []), do: definition
+
+  defp maybe_set_border(definition, %BorderDef{} = border_def) do
+    case BorderDef.to_elixlsx(border_def) do
+      [] -> definition
+      border_keyword -> definition ++ [{:border, border_keyword}]
+    end
+  end
+
   defp maybe_set_border(definition, border_list) when is_list(border_list),
     do: definition ++ [{:border, border_list}]
 

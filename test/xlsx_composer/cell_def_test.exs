@@ -1,4 +1,6 @@
 defmodule XLSXComposer.CellDefTest do
+  alias XLSXComposer.BorderDef
+  alias XLSXComposer.BorderDef.Side
   alias XLSXComposer.CellDef
 
   use ExUnit.Case, async: true
@@ -200,6 +202,39 @@ defmodule XLSXComposer.CellDefTest do
   end
 
   describe "to_elixlsx_def/1" do
+    test "empty raw border produces no border tuple" do
+      assert CellDef.new(%{content: "example", border: []})
+             |> CellDef.to_elixlsx_cell_def() === ["example"]
+    end
+
+    test "typed border converts to an Elixlsx border tuple" do
+      border =
+        BorderDef.new(%{
+          top: Side.new(%{style: :thin}),
+          bottom: Side.new(%{style: :double, color: "#cc3311"})
+        })
+
+      assert CellDef.new(%{content: "example", border: border})
+             |> CellDef.to_elixlsx_cell_def() === [
+               "example",
+               {:border, [top: [style: :thin], bottom: [style: :double, color: "#cc3311"]]}
+             ]
+    end
+
+    test "raw keyword border remains unchanged" do
+      border = [bottom: [style: :double, color: "#cc3311"]]
+
+      assert CellDef.new(%{content: "example", border: border})
+             |> CellDef.to_elixlsx_cell_def() === ["example", {:border, border}]
+    end
+
+    test "nil and empty typed borders produce no border tuple" do
+      for border <- [nil, %BorderDef{}, %BorderDef{top: %Side{}, diagonal_up: false}] do
+        assert CellDef.new(%{content: "example", border: border})
+               |> CellDef.to_elixlsx_cell_def() === ["example"]
+      end
+    end
+
     test "content: String.t()" do
       content = "String"
 
