@@ -7,6 +7,8 @@ defmodule XLSXComposer.Section do
 
   `section_border` adds outward-facing cardinal sides in the default `:outline`
   mode, or every supplied side in `:all` mode. Existing cell sides take precedence.
+  Any other `section_border_mode` (including an explicit `nil`) sets the mode to
+  `nil` and drops the section border entirely.
   """
   alias XLSXComposer.BorderDef
   alias XLSXComposer.CellDef
@@ -20,12 +22,12 @@ defmodule XLSXComposer.Section do
           top_left: ExcelCoords.t(),
           bottom_right: ExcelCoords.t(),
           section_border: BorderDef.t() | keyword() | nil,
-          section_border_mode: :outline | :all
+          section_border_mode: :outline | :all | nil
         }
 
   @type new_attrs() :: %{
           optional(:section_border) => BorderDef.t() | keyword() | nil,
-          optional(:section_border_mode) => :outline | :all,
+          optional(:section_border_mode) => :outline | :all | nil,
           :name => name_t(),
           :top_left => ExcelCoords.t(),
           :cells => CellDef.section_cells()
@@ -46,8 +48,8 @@ defmodule XLSXComposer.Section do
   @spec new(new_attrs()) :: Section.t()
   def new(args) do
     top_left = args[:top_left] || ExcelCoords.new()
-    section_border = args[:section_border]
-    section_border_mode = if args[:section_border_mode] == :all, do: :all, else: :outline
+    section_border_mode = normalize_border_mode(Map.get(args, :section_border_mode, :outline))
+    section_border = if section_border_mode, do: args[:section_border], else: nil
 
     cells =
       (args[:cells] || %{})
@@ -62,6 +64,9 @@ defmodule XLSXComposer.Section do
       section_border_mode: section_border_mode
     }
   end
+
+  defp normalize_border_mode(mode) when mode in [:outline, :all], do: mode
+  defp normalize_border_mode(_mode), do: nil
 
   defp apply_section_border(cells, nil, _mode), do: cells
   defp apply_section_border(cells, _border, _mode) when cells == %{}, do: cells

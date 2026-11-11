@@ -267,11 +267,11 @@ defmodule XLSXComposer.SectionTest do
              }
     end
 
-    test "modes other than all use outline and empty sections remain empty" do
+    test "omitted mode defaults to outline and empty sections remain empty" do
       border = BorderDef.new(%{preset: :thin})
 
-      for mode <- [nil, :outline, :unknown] do
-        section = Section.new(%{name: "empty", section_border: border, section_border_mode: mode})
+      for args <- [%{}, %{section_border_mode: :outline}] do
+        section = Section.new(Map.merge(%{name: "empty", section_border: border}, args))
         assert section.cells === %{}
         assert section.bottom_right === section.top_left
         assert section.section_border === border
@@ -280,6 +280,25 @@ defmodule XLSXComposer.SectionTest do
 
       assert Section.new(%{name: "empty all", section_border: border, section_border_mode: :all}).cells ===
                %{}
+    end
+
+    test "invalid or nil modes drop the section border and leave cells unchanged" do
+      border = BorderDef.new(%{preset: :thin})
+      cells = %{SectionCoords.new({0, 0}) => CellDef.new(%{content: "a"})}
+
+      for mode <- [nil, :unknown, "all"] do
+        section =
+          Section.new(%{
+            name: "invalid",
+            cells: cells,
+            section_border: border,
+            section_border_mode: mode
+          })
+
+        assert section.cells === cells
+        assert section.section_border === nil
+        assert section.section_border_mode === nil
+      end
     end
   end
 
