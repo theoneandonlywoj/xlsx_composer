@@ -1,5 +1,5 @@
 # XLSXComposer
-An wrapper arround `elixlsx` that focuses on readability and performance (`elixlsx` suffers big penalties when using a lot of `set_cell/2`)
+A declarative wrapper around `elixlsx` that focuses on readability and performance (`elixlsx` slows down when a sheet is built with many `set_cell` calls).
 
 ## Installation
 
@@ -16,9 +16,11 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/xlsx_composer>.
+## Documentation
+
+The guides are on [HexDocs](https://hexdocs.pm/xlsx_composer): Overview,
+Components, a tested Example and Why XLSXComposer vs Elixlsx. Run `mix docs` to
+build them locally.
 
 ## Development
 

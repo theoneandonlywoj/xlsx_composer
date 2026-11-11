@@ -1,8 +1,9 @@
 defmodule XLSXComposer.SectionCoords do
   @moduledoc """
-  #{__MODULE__} represents location of the cell in a given section.
+  Location of a cell in a section: 0-based `x` (column) and `y` (row) offsets
+  from the section's `top_left`.
 
-  This approach allows use to move a group of cells at ones.
+  This allows us to move a group of cells at once.
   Furthermore, this approach allows for an easier understanding of the structure of the document while being performant.
   """
   alias XLSXComposer.SectionCoords

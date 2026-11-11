@@ -1,9 +1,14 @@
 defmodule XLSXComposer.Section do
   @moduledoc """
-  #{__MODULE__} allows to group cells into units that we can reason and test on that level.
+  A named group of cells keyed by `XLSXComposer.SectionCoords` and placed at a
+  `top_left` `XLSXComposer.ExcelCoords`, so it can be moved, reasoned about and
+  tested as one unit.
 
-  WARNING! : limit number of Sections otherwise the process of the checks might hurt your performance!
-  Soon, implementation of checking of Sections overlap will have to be done so use Section carefully.
+  Nothing checks overlap automatically: when sections overlap, the later one
+  wins silently. `overlap?/2` only tests whether either section's top-left corner
+  falls inside the other (it misses e.g. cross-shaped overlaps), so it is not a
+  full overlap check. Sections with a duplicate name are dropped when sheets are
+  built (first wins).
 
   `section_border` adds outward-facing cardinal sides in the default `:outline`
   mode, or every supplied side in `:all` mode. Existing cell sides take precedence.

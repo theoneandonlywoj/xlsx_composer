@@ -1,8 +1,14 @@
 defmodule XLSXComposer.CellDef do
   @moduledoc """
-  #{__MODULE__} showcases all supported options as a struct that is later folded into representation required by Elixlsx.
+  One cell: its `content` plus optional style, folded into the keyword form
+  expected by Elixlsx. The Components guide lists every option.
 
-  `:configuration` is a map of settings you might want to use to tag elements and later on, globally collect and apply an additional style if required.
+  Colors are `"#RRGGBB"` strings. For dates, set `num_format` to a date pattern
+  such as `"mm/dd/yyyy"`; `datetime` and `yyyymmdd` are truthy flags that
+  override `num_format` with ISO formats.
+
+  `:configuration` is a map for tagging cells, e.g. to collect them later and
+  apply an additional style; it is not written to the file.
   """
   alias XLSXComposer.BorderDef
   alias XLSXComposer.CellDef
