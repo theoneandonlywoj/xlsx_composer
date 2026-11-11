@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: "Version upgrade: SMALL (patch), MINOR or MAJOR"
+        type: choice
+        options: [SMALL, MINOR, MAJOR]
+        default: SMALL
+        required: true
+
+# One release at a time per repository; a running publication is never cancelled.
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+# Pushes the release commit and tag, then creates the GitHub Release.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      # Refuse before checkout or any mutation; the secret reaches the shell via env.
+      - name: Require main and a nonblank HEX_API_KEY
+        env:
+          REF: ${{ github.ref }}
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: |
+          if [[ "$REF" != "refs/heads/main" ]]; then
+            echo "::error::Dispatch the Release workflow from main (got $REF)."
+            exit 1
+          fi
+          if [[ -z "${HEX_API_KEY//[[:space:]]/}" ]]; then
+            echo "::error::Configure a nonblank HEX_API_KEY repository secret."
+            exit 1
+          fi
+
+      # The default ref/SHA is this event's: rerunning checks out the original
+      # commit on attached main, never today's main. make release then
+      # refuses if origin/main has advanced. Tags and history are needed for the
+      # target-tag checks and the release commit.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-beam
+        with:
+          plt: "true"
+
+      - name: Configure the release author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Pushes made with GITHUB_TOKEN start no CI run, so the release validates
+      # itself: release tests here, every other gate inside make release.
+      - run: make release-test
+
+      # Inputs reach the shell through env, never as ${{ }} in run. gh reads
+      # GH_TOKEN; git push uses the credentials checkout persisted.
+      - name: Release
+        env:
+          LEVEL: ${{ inputs.level }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        run: make release bump="$LEVEL"
